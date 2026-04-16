@@ -38,7 +38,7 @@ export function Dashboard({ projectId }) {
   async function seed(reset = false) {
     setSeeding(true);
     try {
-      const resp = await apiFetch(`/api/projects/${projectId}/seed-demo`, {
+      const resp = await apiFetch(`/api/projects/${projectId}/events?action=seed`, {
         method: 'POST',
         body: { reset },
       });

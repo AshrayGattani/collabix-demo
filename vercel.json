@@ -4,6 +4,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
+    { "source": "/api/projects/:projectId/seed-demo", "destination": "/api/projects/:projectId/events?action=seed" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "crons": [

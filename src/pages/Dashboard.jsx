@@ -38,6 +38,27 @@ export function Dashboard({ projectId }) {
   const isAdmin = snap?.members?.find((m) => m.user_id === user.id)?.role !== 'member';
   const viewAsMember = viewAs ? snap?.members?.find((m) => m.user_id === viewAs) : null;
 
+  async function renameProject() {
+    const newName = prompt('New project name:', snap.project.name);
+    if (!newName || newName.trim() === snap.project.name) return;
+    try {
+      await apiFetch(`/api/projects/${projectId}`, { method: 'PATCH', body: { name: newName.trim() } });
+      await load(thresholds);
+    } catch (e) {
+      alert('Rename failed: ' + (e.body?.error || e.message));
+    }
+  }
+
+  async function deleteProject() {
+    if (!confirm(`Delete "${snap.project.name}"? This cannot be undone.`)) return;
+    try {
+      await apiFetch(`/api/projects/${projectId}`, { method: 'DELETE' });
+      navigate('/');
+    } catch (e) {
+      alert('Delete failed: ' + (e.body?.error || e.message));
+    }
+  }
+
   async function seed(reset = false) {
     setSeeding(true);
     try {
@@ -98,6 +119,7 @@ export function Dashboard({ projectId }) {
               </select>
             </div>
           )}
+          {isAdmin && <button className="btn btn-ghost" onClick={renameProject}>Rename</button>}
           {isAdmin && <button className="btn btn-ghost" onClick={() => setShowInvite(true)}>Invite</button>}
           {isAdmin && <button className="btn btn-ghost" onClick={() => setShowShare(true)}>Share</button>}
           {isAdmin && (
@@ -112,6 +134,7 @@ export function Dashboard({ projectId }) {
           )}
           <button className="btn btn-ghost" onClick={() => load(thresholds)}>Refresh</button>
           <button className="btn btn-ghost" onClick={() => exportReportPdf(snap)}>Export PDF</button>
+          {isAdmin && <button className="btn btn-ghost btn-danger" onClick={deleteProject}>Delete</button>}
           <span className="muted small">{user.email}</span>
           <button className="btn btn-ghost" onClick={signOut}>Sign out</button>
         </div>
